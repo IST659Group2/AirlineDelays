@@ -23,7 +23,7 @@ Link to data: https://www.kaggle.com/giovamata/airlinedelaycauses/data
 
 ```{r}
 #Importing the data
-df <- read_csv("DelayedFlights.csv")
+df <- read.csv("~/Syracuse/Coursework/IST 687 Intro to Data Science/DelayedFlights.csv")
 ```
 
 ```{r}
@@ -124,7 +124,7 @@ b$percentTotal <- round(b$Flights/sum(b$Flights),digits=4)*100
 b[order(-b$Flights),]
 ```
 
-We can see that WN (Southwest Airlines Co.) has the most flights (19.5% of tota). In tallying delay frequencies, we should make sure to account for them having more total flights than other airlines. 
+We can see that WN (Southwest Airlines Co.) has the most flights (19.5% of total). In tallying delay frequencies, we should make sure to account for them having more total flights than other airlines. 
 
 First, let's explore the delay data a little quickly before subsetting by airline. 
 
@@ -157,37 +157,78 @@ rownames(avgDelayCarrier) <- NULL
 avgDelayCarrier
 ```
 
-From this, it appears that YV (Mesa Airlines, Inc.) has the longest avgDelay at 55.29 minutes. The airline with the longest delays was AQ (not found) that had the shortest delays at 21.26 minutes. 
+From this, it appears that YV (Mesa Airlines, Inc.) has the longest avgDelay at 55.29 minutes. The airline with the shortest delays was AQ (not found) that had the average delay length at 21.26 minutes. 
 
 ```{r}
 ggplot(avgDelayCarrier,aes(x=Airline,y=diffFromAvg)) + geom_bar(aes(fill=diffFromAvg),color="black",stat="identity") + scale_fill_gradient2(low = "blue",high="red")
 ```
 
+####Type 1 Data Question
+
+What is the average length of a delay?
 ```{r}
+#first, factor out early arrivals by changing negative numbers in $ArrDelay to 0 so that it does not falsely weigh down the average delay time.
+only_delays <-df_clean #make a copy of clean data
+
+only_delays$ArrDelay[only_delays$ArrDelay < 0] <-0
+
+head(only_delays$ArrDelay, 20) #check new column
+
+#calculate central tendancies
+
+delay_mean<-mean(only_delays$ArrDelay[])
+paste("mean - negatives:",delay_mean,sep="")
+
+delay_mean<-mean(df_clean$ArrDelay)
+paste("mean + negatives:",delay_mean,sep="")
+
+delay_median<-median(only_delays$ArrDelay)
+paste("median:",delay_median,sep="")
+
+#install.packages("modeest") #package to calculate mode
+library(modeest)
+
+delay_mode<-mfv(df_clean$ArrDelay) #using df_clean for mode to factor out increased population of 0
+paste("mode:",delay_mode,sep="")
+
+
+```
+It was surprising to see that the average length of delay did not change that much when computing with the original early arrival numbers. 
+
+All in all, the average length of a delay is about 42 minutes long. However, airline delays are most commonly only 10 minutes long. The median of this data set is 24 minutes. 
+
+
+#### Type 1 Data Question
+How frequently do delays occur (for specific airlines)?
+
+```{r}
+#create new data frame 
+df_delays <- data.frame(only_delays$UniqueCarrier, only_delays$ArrDelay)
+names(df_delays)<-c("UniqueCarrier","ArrDelay")
+head(df_delays,25)
 
 ```
 
 ```{r}
+#subset out any rows with 0 to eliminate flights that were not delayed
+df_delays <-df_delays[apply(df_delays[c(2)],1,function(y) !any(y==0)),]
 
+head(df_delays, 25)
 ```
-
 ```{r}
+counts<-table(df_delays$UniqueCarrier) #count the number of time an airline has a listed delay
+
+counts[order(counts)] #order frequency by least to greatest
+
+#visualize data
+#preparing bar graph by ensuring labels fit neatly
+par(las=2) #make labels perpendicular to axis
+par(mar=c(5,8,4,2))
+
+barplot(counts, main="Delay Frequency Distribution", xlab="Unique Carrier", cex.names=0.8)
 
 ```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-
+Southwest Airlines delays most frequently, but there is a correlation with the amount of flights they have. American Airlines has the second most frequent delays. 
 
 
 
