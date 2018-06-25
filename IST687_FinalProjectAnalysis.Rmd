@@ -299,7 +299,7 @@ ggplot(df_month, aes(x = Month, y = Freq, group = 1)) +
 
 We can see that December has the most delays, which makes sense since it contains holidays where a lot of travel occurs and is also a cold month.
 
-####Which month has the most delays?
+####Which day of the week has the most delays?
 
 ```{r}
 #sort month in chronological order
