@@ -351,7 +351,7 @@ b$percentTotal <- round(b$Flights/sum(b$Flights),digits=4)*100
 b[order(-b$Flights),]
 ```
 
-We can see that WN (Southwest Airlines Co.) has the most flights (19.5% of tota). In tallying delay frequencies, we should make sure to account for them having more total flights than other airlines. 
+We can see that WN (Southwest Airlines Co.) has the most flights (19.5% of total). In tallying delay frequencies, we should make sure to account for them having more total flights than other airlines. 
 
 ```{r}
 c <- tapply(df_clean$ArrDelay,df_clean$UniqueCarrier,mean)
