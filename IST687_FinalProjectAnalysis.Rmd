@@ -265,6 +265,7 @@ d_merge <- merge(delayedFlights,e,by="Airline")
 #find percent of flights delayed and order by percent delayed
 d_merge$percentDelayed <- round(d_merge$delayedFlights * 100 / d_merge$totalFlights,1)
 d_merge <- d_merge %>% arrange(desc(percentDelayed))
+d_merge
 ```
 
 ```{r}
@@ -299,7 +300,36 @@ ggplot(df_month, aes(x = Month, y = Freq, group = 1)) +
 
 We can see that December has the most delays, which makes sense since it contains holidays where a lot of travel occurs and is also a cold month.
 
-####Which month has the most delays?
+Now we can repeat this analysis with American Airlines to compare. 
+
+```{r}
+df_AA <- subset(only_delays, only_delays$UniqueCarrier == "AA")
+table(df_AA$Month)
+df_AA_MonthDelay <- as.data.frame(table(df_AA$Month))
+colnames(df_AA_MonthDelay) <- c("Month","Freq") #change column names
+#plot a line graph 
+ggplot(df_AA_MonthDelay, aes(x = Month, y = Freq, group = 1)) + 
+      geom_line(color = "orange")+ geom_point(color = "darkgreen", size = 2) + 
+      geom_text(aes(label = Freq),hjust=0, vjust=0,nudge_x = -.4, nudge_y = -5,size=3.5) +
+      theme(axis.text.x = element_text(angle = 90, hjust = 1)) + ggtitle("American Airlines Delays by Month") + theme(plot.title = element_text(hjust = 0.5))
+```
+AA has the most delays in June.
+
+Now that we have each graph, we can try to combine them into one graph for easy comparision. 
+
+```{r}
+df_AA <- subset(only_delays, only_delays$UniqueCarrier == "AA")
+table(df_AA$Month)
+df_AA_MonthDelay <- as.data.frame(table(df_AA$Month))
+colnames(df_AA_MonthDelay) <- c("Month","Freq") #change column names
+#plot a line graph 
+ggplot(df_AA_MonthDelay, aes(x = Month, y = Freq * 10, group = 1)) + 
+      geom_line(aes(color = "American Airlines"),size=1.5) + geom_line(data = df_month, aes(x = Month, y = Freq, group = 1, color = "Industry"), size = 1.5) +
+      theme(axis.text.x = element_text(angle = 90, hjust = 1)) + ggtitle("American Airlines vs. Industry Delays by Month") + theme(plot.title = element_text(hjust = 0.5), legend.position = ) + scale_y_continuous(sec.axis = sec_axis(~ . * 1/10,name = "American Airlines")) + ylab("Industry Delays") +
+  scale_colour_manual(values=c('American Airlines'='blue', 'Industry'='red'))
+```
+
+####Which day of the week has the most delays?
 
 ```{r}
 #sort month in chronological order
@@ -321,6 +351,41 @@ ggplot(df_dayOfWeek, aes(x = DayOfWeek, y = Freq, group = 1)) +
 ```
 
 We can see that Friday has the most delays, which again is intuitive since a lot of flights likely occur on Fridays. 
+
+Now we can repeat this analysis with American Airlines to compare. 
+
+```{r}
+#sort month in chronological order
+df_AA$DayOfWeek <- factor(df_AA$DayOfWeek, 
+                            levels = c("Monday","Tuesday","Wednesday","Thursday",
+                                     "Friday","Saturday","Sunday"))
+table(df_AA$DayOfWeek)
+df_AA_DayOfWeek <- as.data.frame(table(df_AA$DayOfWeek))
+colnames(df_AA_DayOfWeek) <- c("DayOfWeek","Freq") #change column names
+#plot a line graph 
+ggplot(df_AA_DayOfWeek, aes(x = DayOfWeek, y = Freq, group = 1)) + 
+      geom_line(color = "orange")+ geom_point(color = "darkgreen", size = 2) +   
+      geom_text(aes(label = Freq),hjust=0, vjust=0) +
+      theme(axis.text.x = element_text(angle = 90, hjust = 1)) +  ggtitle("American Airlines Delays by Day of the Week") + theme(plot.title = element_text(hjust = 0.5))
+```
+Friday has the most delay for AA, same as industry standard.
+
+Now that we have each graph, we can try to combine them into one graph for easy comparision. 
+
+```{r}
+#sort month in chronological order
+df_AA$DayOfWeek <- factor(df_AA$DayOfWeek, 
+                            levels = c("Monday","Tuesday","Wednesday","Thursday",
+                                     "Friday","Saturday","Sunday"))
+table(df_AA$DayOfWeek)
+df_AA_DayOfWeek <- as.data.frame(table(df_AA$DayOfWeek))
+colnames(df_AA_DayOfWeek) <- c("DayOfWeek","Freq") #change column names
+#plot a line graph 
+ggplot(df_AA_DayOfWeek, aes(x = DayOfWeek, y = Freq * 10, group = 1)) + 
+      geom_line(aes(color = "American Airlines"), size = 1.5) + geom_line(data = df_dayOfWeek, aes(x = DayOfWeek, y = Freq, group = 1, color = "Industry"), size = 1.5) +
+      theme(axis.text.x = element_text(angle = 90, hjust = 1)) +  ggtitle("American Airlines Delays by Day of the Week") + theme(plot.title = element_text(hjust = 0.5)) + scale_y_continuous(sec.axis = sec_axis(~ . * 1/10,name = "American Airlines")) + ylab("Industry Delays") +
+  scale_colour_manual(values=c('American Airlines'='blue', 'Industry'='red'))
+```
 
 ####Which day of the month has the most delay 
 
@@ -650,14 +715,18 @@ min(df_clean$ArrDelay)
 ```
 
 ```{r}
-#create logArrDelay
-df_clean$logArrDelay <- log(df_clean$ArrDelay + 67)
-head(df_clean)
+#create logArrDelay. Adding the 109 to account for negative values.
+df_clean$logArrDelay <- log(df_clean$ArrDelay + 109)
+#make sure there are no NA's
+df_clean_log <- df_clean[complete.cases(df_clean$logArrDelay),]
+#remove any values with -Inf
+df_clean_log <- df_clean[df_clean$logArrDelay!=-Inf,]
+summary(df_clean_log$logArrDelay)
 ```
 
 ```{r}
-model4 <- lm(data = df_clean, formula = logArrDelay ~ UniqueCarrier + Distance + DayOfWeek + DepTime + Month)
-summary(model4)
+model5 <- lm(data = df_clean_log, formula = logArrDelay ~ UniqueCarrier + Origin + Distance + DayOfWeek + DepTime + Month)
+summary(model5)
 ```
 
 ```{r}
