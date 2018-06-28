@@ -780,6 +780,76 @@ We have a classification rate of 59%, which is not great.
  
 ```
 
+###What is the impact of each "cause of delay"?
+
+TYPE 2 Question: What are the impacts of each cause airline delays?
+```{r}
+Total_CarrierDelay <- sum(df_clean$CarrierDelay, na.rm=TRUE)
+print(paste ("Carrier caused a total of", Total_CarrierDelay, "minutes in delay"))
+Mean_CarrierDelay <- mean(df_clean$CarrierDelay, na.rm=TRUE)
+print(paste ("Carrier caused an average of", Mean_CarrierDelay, "minutes in delay"))
+
+Total_WeatherDelay <- sum(df_clean$WeatherDelay, na.rm=TRUE)
+print(paste ("Weather caused a total of", Total_WeatherDelay, "minutes in delay"))
+Mean_WeatherDelay <- mean(df_clean$WeatherDelay, na.rm=TRUE)
+print(paste ("Weather caused an average of", Mean_WeatherDelay, "minutes in delay"))
+
+Total_NASDelay <- sum(df_clean$NASDelay, na.rm=TRUE)
+print(paste ("NAS caused a total of", Total_NASDelay, "minutes in delay"))
+Mean_NASDelay <- mean(df_clean$NASDelay, na.rm=TRUE)
+print(paste ("NAS caused an average of", Mean_NASDelay, "minutes in delay"))
+
+Total_SecDelay <-sum(df_clean$SecurityDelay, na.rm=TRUE)
+print(paste ("Security issues caused a total of", Total_SecDelay, "minutes in delay"))
+Mean_SecDelay <-mean(df_clean$SecurityDelay, na.rm=TRUE)
+print(paste ("Security issues caused an average of", Mean_SecDelay, "minutes in delay"))
+
+Total_LateDelay <- sum(df_clean$LateAircraftDelay, na.rm=TRUE)
+print(paste ("Late arrivals caused a total of", Total_LateDelay, "minutes in delay"))
+Mean_LateDelay <- mean(df_clean$LateAircraftDelay, na.rm=TRUE)
+print(paste ("Late arrivals caused an average of", Mean_LateDelay, "minutes in delay"))
+```
+
+Late arrivals cause the most amount of delays in minutes and therefore is the biggest industry standard issue. It causes an average of 25 minutes per delay. 
+
+```{r}
+#create a dataframe filtered with only American Airlines data
+AA_only <-df_clean[df_clean$UniqueCarrier=='AA',]
+head(AA_only)
+```
+
+Find out which delay causes most delay minutes for AA
+
+```{r}
+AA_CarrierDelay <- sum(AA_only$CarrierDelay, na.rm=TRUE)
+print(paste ("Carrier caused a total of", AA_CarrierDelay, "minutes in delay"))
+Mean_AA_CarrierDelay <- mean(AA_only$CarrierDelay, na.rm=TRUE)
+print(paste ("Carrier caused an average of", Mean_AA_CarrierDelay, "minutes in delay"))
+
+AA_WeatherDelay <- sum(AA_only$WeatherDelay, na.rm=TRUE)
+print(paste ("Weather caused a total of", AA_WeatherDelay, "minutes in delay"))
+Mean_AA_WeatherDelay <- mean(AA_only$WeatherDelay, na.rm=TRUE)
+print(paste ("Weather caused an average of", Mean_AA_WeatherDelay, "minutes in delay"))
+
+
+AA_NASDelay <- sum(AA_only$NASDelay, na.rm=TRUE)
+print(paste ("NAS caused a total of", AA_NASDelay, "minutes in delay"))
+Mean_AA_NASDelay <- mean(AA_only$NASDelay, na.rm=TRUE)
+print(paste ("NAS caused an average of", Mean_AA_NASDelay, "minutes in delay"))
+
+AA_SecDelay <-sum(AA_only$SecurityDelay, na.rm=TRUE)
+print(paste ("Security issues caused a total of", AA_SecDelay, "minutes in delay"))
+Mean_AA_SecDelay <-mean(AA_only$SecurityDelay, na.rm=TRUE)
+print(paste ("Security issues caused an average of", Mean_AA_SecDelay, "minutes in delay"))
+
+AA_LateDelay <- sum(AA_only$LateAircraftDelay, na.rm=TRUE)
+print(paste ("Late arrivals caused a total of", AA_LateDelay, "minutes in delay"))
+Mean_AA_LateDelay <- mean(AA_only$LateAircraftDelay, na.rm=TRUE)
+print(paste ("Late arrivals caused an average of", Mean_AA_LateDelay, "minutes in delay"))
+```
+
+Late arrivals caused the most amount of delays in minutes for AA, which is consistent with industry standard.
+
 
 
 
